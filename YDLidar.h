@@ -19,7 +19,7 @@
 #define LIDAR_CMD_FORCE_STOP                0x00
 #define LIDAR_CMD_GET_EAI                   0x55
 #define LIDAR_CMD_GET_DEVICE_INFO           0x90
-#define LIDAR_CMD_GET_DEVICE_HEALTH         0x92
+#define LIDAR_CMD_GET_DEVICE_HEALTH         0x91
 #define LIDAR_CMD_SYNC_BYTE                 0xA5
 #define LIDAR_CMDFLAG_HAS_PAYLOAD           0x8000
 
