@@ -253,7 +253,7 @@ result_t YDLidar::waitScanDot(uint32_t timeout) {
       case 2:
         SampleNumlAndCTCal = currentByte;
 
-        if ((currentByte != CT_Normal) && (currentByte != CT_RingStart)) {
+        if (((currentByte&0x01) != CT_Normal) && ((currentByte & 0x01) != CT_RingStart)) {
           recvPos = 0;
           continue;
         }
@@ -382,7 +382,7 @@ result_t YDLidar::waitScanDot(uint32_t timeout) {
   uint8_t package_CT;
   package_CT = package.package_CT;
 
-  if (package_CT == CT_Normal) {
+  if ((package_CT&0x01) == CT_Normal) {
     node.sync_quality = Node_Default_Quality + Node_NotSync;
   } else {
     node.sync_quality = Node_Default_Quality + Node_Sync;
