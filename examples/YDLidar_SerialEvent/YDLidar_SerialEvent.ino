@@ -18,7 +18,7 @@ YDLidar lidar;
 bool isScanning = false;   
 
 #define YDLIDAR_MOTOR_SCTP 3 // The PWM pin for control the speed of YDLIDAR's motor. 
-#define YDLIDAR_MOTRO_EN   7 // The ENABLE PIN for YDLIDAR's motor                                     
+#define YDLIDAR_MOTOR_EN   7 // The ENABLE PIN for YDLIDAR's motor                                     
  
 
 QueueList<scanPoint> scans;                   
@@ -32,7 +32,7 @@ void setup() {
   lidar.begin(Serial, 128000);
   //output mode
   pinMode(YDLIDAR_MOTOR_SCTP, OUTPUT);
-  pinMode(YDLIDAR_MOTRO_EN, OUTPUT);
+  pinMode(YDLIDAR_MOTOR_EN, OUTPUT);
 
 
   while(Serial.read() >= 0){};
@@ -46,7 +46,7 @@ void loop() {
             scanPoint _point;
             _point = scans.pop();
             float distance = _point.distance; //distance value in mm unit
-            float angle    =  _point.angle; //anglue value in degree
+            float angle    =  _point.angle; //angle value in degree
             Serial.print("current angle:");
             Serial.println(angle, DEC);
             Serial.print("current distance:");
@@ -54,7 +54,7 @@ void loop() {
         }
     }else{
         //stop motor
-	digitalWrite(YDLIDAR_MOTRO_EN, LOW);
+	digitalWrite(YDLIDAR_MOTOR_EN, LOW);
         setMotorSpeed(0);
         restartScan();
     }
@@ -70,7 +70,7 @@ void serialEvent() {
             scans.push(_point);
           }
      }else{
-       Serial.println(" YDLIDAR get Scandata fialed!!");
+       Serial.println(" YDLIDAR get Scandata failed!!");
        //restartScan();
      }
 }
@@ -155,7 +155,7 @@ void restartScan(){
               if(lidar.startScan() == RESULT_OK){
                 isScanning = true;
                 //start motor in 1.8v
-		digitalWrite(YDLIDAR_MOTRO_EN, HIGH);
+		digitalWrite(YDLIDAR_MOTOR_EN, HIGH);
                 setMotorSpeed(1.8);
                 Serial.println("Now YDLIDAR is scanning ......");
               //delay(1000);
