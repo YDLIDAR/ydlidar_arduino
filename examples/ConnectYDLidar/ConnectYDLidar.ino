@@ -16,7 +16,7 @@ bool isScanning = false;
 
 
 #define YDLIDAR_MOTOR_SCTP 3 // The PWM pin for control the speed of YDLIDAR's motor. 
-#define YDLIDAR_MOTRO_EN   7 // The ENABLE PIN for YDLIDAR's motor                  
+#define YDLIDAR_MOTOR_EN   7 // The ENABLE PIN for YDLIDAR's motor                  
                     
                         
 void setup() {
@@ -28,7 +28,7 @@ void setup() {
   lidar.begin(Serial, 128000);
 //output mode
   pinMode(YDLIDAR_MOTOR_SCTP, OUTPUT);
-  pinMode(YDLIDAR_MOTRO_EN, OUTPUT);
+  pinMode(YDLIDAR_MOTOR_EN, OUTPUT);
 
 
   while(Serial.read() >= 0){};
@@ -51,7 +51,7 @@ void loop() {
       }
     }else{
         //stop motor
-	    digitalWrite(YDLIDAR_MOTRO_EN, LOW);
+	    digitalWrite(YDLIDAR_MOTOR_EN, LOW);
 	    setMotorSpeed(0);
 	    restartScan();
     }
@@ -140,7 +140,7 @@ void restartScan(){
                 isScanning = true;
                 //start motor in 1.8v
 		        setMotorSpeed(1.8);
-		digitalWrite(YDLIDAR_MOTRO_EN, HIGH);
+		digitalWrite(YDLIDAR_MOTOR_EN, HIGH);
                 Serial.println("Now YDLIDAR is scanning ......");
               //delay(1000);
               }else{
