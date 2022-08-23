@@ -51,14 +51,19 @@
 #define LIDAR_STATUS_ERROR                 0x2
 
 #define PackageSampleBytes 2
-#define PackageSampleMaxLngth 0x80
+#define PackageSampleMaxLngth 0x40
 #define Node_Default_Quality (10<<2)
 #define Node_Sync 1
 #define Node_NotSync 2
 #define PackagePaidBytes 10
 #define PH 0x55AA
+#define PH1 0xAA
+#define PH2 0x55
 
+#define YDLIDAR_MOTOR_SCTP 3 // The PWM pin for control the speed of YDLIDAR's motor.
+#define YDLIDAR_MOTOR_EN 7 // The ENABLE PIN for YDLIDAR's motor
 
+//CT定义
 typedef enum {
   CT_Normal = 0,
   CT_RingStart  = 1,
@@ -66,21 +71,44 @@ typedef enum {
 } CT;
 
 struct node_info {
-  uint8_t    sync_quality;
-  uint16_t   angle_q6_checkbit;
-  uint16_t   distance_q2;
+  uint8_t sync_flag;
+  uint8_t quality;
+  uint16_t angle;
+  uint16_t distance;
 } __attribute__((packed)) ;
 
-struct node_package {
+//单包数据头
+struct node_package_head {
   uint16_t  package_Head;
   uint8_t   package_CT;
   uint8_t   nowPackageNum;
   uint16_t  packageFirstSampleAngle;
   uint16_t  packageLastSampleAngle;
   uint16_t  checkSum;
-  uint16_t  packageSampleDistance[PackageSampleMaxLngth];
-} __attribute__((packed)) ;
+} __attribute__((packed));
+//单点（不带信号强度）
+struct node_point {
+  uint16_t is : 2;
+  uint16_t dist : 14;
+} __attribute__((packed));
+//单点（带信号强度）
+struct node_point_i {
+  uint8_t quality;
+  uint16_t is : 2;
+  uint16_t dist : 14;
+} __attribute__((packed));
 
+//单包点云数据（不带信号强度）
+struct node_package {
+  node_package_head head;
+  node_point points[PackageSampleMaxLngth];
+} __attribute__((packed));
+
+//单包点云数据（带信号强度）
+struct node_package_i {
+  struct node_package_head head;
+  node_point_i points[PackageSampleMaxLngth];
+} __attribute__((packed));
 
 struct device_info {
   uint8_t   model;
@@ -135,8 +163,9 @@ struct scanPoint {
 
 
 //YDLidar class
-class YDLidar {
- public:
+class YDLidar 
+{
+public:
   enum {
     SERIAL_BAUDRATE = 115200,
     DEFAULT_TIMEOUT = 500,
@@ -154,6 +183,14 @@ class YDLidar {
 
   // check whether the serial interface is opened
   bool isOpen(void);
+
+  //设置强度位数信息（0表示不带信号强度，8表示8位信号强度，10表示10位信号强度）
+  void setIntensity(int i);
+  //设置单/双通
+  void setSingleChannel(bool yes);
+  bool isSingleChannel() const {return singleChannel;}
+  //设置电机速度
+  void setMotorSpeed(float vol);
 
   // ask the YDLIDAR for its health info
   result_t getHealth(device_health &health, uint32_t timeout = DEFAULT_TIMEOUT);
@@ -175,13 +212,19 @@ class YDLidar {
     return point;
   }
 
- protected:
+protected:
   // send ask commond to YDLIDAR
   result_t sendCommand(uint8_t cmd, const void *payload = NULL, size_t payloadsize = 0);
   //wait for response header to arrive
-  result_t waitResponseHeader(lidar_ans_header *header, uint32_t timeout = DEFAULT_TIMEOUT);
+  result_t waitResponseHeader(
+    lidar_ans_header *header, 
+    uint8_t cmd = 0,
+    uint32_t timeout = DEFAULT_TIMEOUT);
 
- protected:
-  HardwareSerial *_bined_serialdev;
+protected:
+  HardwareSerial *_bined_serialdev = NULL;
   scanPoint point;
+  int intensity = 0; //信号强度位数（0表示不带信号强度，8表示8位信号强度，10表示10位信号强度）
+  uint8_t* packageBuffer = NULL; //接收缓存
+  bool singleChannel = false; //单通标识
 };

@@ -16,3 +16,5 @@ stop	KEYWORD2
 startScan	KEYWORD2
 waitScanDot	KEYWORD2
 getCurrentScanPoint	KEYWORD2
+setIntensity KEYWORD2
+setSingleChannel KEYWORD2
