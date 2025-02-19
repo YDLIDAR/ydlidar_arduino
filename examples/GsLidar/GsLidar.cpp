@@ -187,13 +187,13 @@ bool GsLidar::getPoints(Points& ps, uint32_t timeout)
         fflush(stdout);
       }
       //读取校验和字节
-      c = m_hs->read();
-      if (c < 0)
+      s = m_hs->readBytes(buff, 1); //借用环境标记的位置存储校验和字节
+      if (s < 1)
       {
         printf("Fail to read check sum byte\n");
         return false;
       }
-      scs = c;
+      scs = buff[0];
       if (ccs != scs)
       {
         printf("Check sum error calc[0x%02X] != [0x%02X]\n", ccs, scs);
@@ -252,6 +252,8 @@ bool GsLidar::getPoints(Points& ps, uint32_t timeout)
             angTrans(dist, i, &angle, &dist);
         }
 
+        //TODO: 可考虑增加去重代码
+
         p.angle = angle;
         p.dist = dist;
         ps.points[i] = p;
@@ -273,6 +275,8 @@ String GsLidar::getVersion() const
 {
   //V1.0
   //初版
+  //V1.1
+  //优化读取点云数据校验和字节失败的问题
   return "V1.0";
 }
 
@@ -447,10 +451,10 @@ void GsLidar::angTrans(
     Dist = sqrt(tempX * tempX + tempY * tempY);
     theta = atan(tempY / tempX) * 180 / M_PI;
   }
-  if (theta < 0)
-  {
-    theta += 360;
-  }
+  // if (theta < 0)
+  // {
+  //   theta += 360;
+  // }
   *dstTheta = theta;
   *dstDist = Dist;
 }
@@ -468,10 +472,10 @@ void GsLidar::angTrans2(
   Dist = dist / cos(tempTheta * M_PI / 180);
   theta = tempTheta;
 
-  if (theta < 0)
-  {
-    theta += 360;
-  }
+  // if (theta < 0)
+  // {
+  //   theta += 360;
+  // }
   *dstTheta = theta;
   *dstDist = Dist;
 }

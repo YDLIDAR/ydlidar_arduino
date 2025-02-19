@@ -13,7 +13,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
 
   // hs.begin(230400, SERIAL_8N1, 5, 6);
-  hs.begin(230400);
+  hs.begin(921600);
   //设置串口波特率
   lidar.begin(hs);
   // lidar.setEnableDebug(true); //启用调试
@@ -24,16 +24,17 @@ void setup() {
 }
 
 void loop() {
- Points ps;
- if (lidar.getPoints(ps)) {
-   printf("Get %d points\n", ps.count);
-  //  for (int i = 0; i < ps.count; ++i) {
-  //    const Point& p = ps.points[i];
-  //    printf("P%d a:%d d:%d\n", i, int(p.angle * 10), int(p.dist)); //无法打印浮点型数据
-  //  }
- } else {
-   printf("Fail to get points!\n");
- }
- digitalWrite(LED_BUILTIN, on ? HIGH : LOW); //点亮LED
- on = !on;
+  Points ps;
+  if (lidar.getPoints(ps)) {
+    //  printf("Get %d points\n", ps.count);
+    for (int i = 0; i < ps.count; ++i) {
+      const Point& p = ps.points[i];
+      //注：因可能无法打印浮点型数据，角度值可放大10倍后打印
+      printf("p%d a:%.02f° d:%.0f\n", i, p.angle, p.dist);
+    }
+  } else {
+    printf("Fail to get points!\n");
+  }
+  digitalWrite(LED_BUILTIN, on ? HIGH : LOW);  //点亮LED
+  on = !on;
 }

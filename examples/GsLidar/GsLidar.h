@@ -34,9 +34,6 @@
 #define GS2_ANGLE 22.5 //GS2角度参数
 #define GS5_ANGLE 16.0 //GS5角度参数
 
-#define YDLIDAR_MOTOR_SCTP 3 // The PWM pin for control the speed of YDLIDAR's motor.
-#define YDLIDAR_MOTOR_EN 7 // The ENABLE PIN for YDLIDAR's motor
-
 
 //GS系列设备信息（对外协议）
 struct gs_device_info {
