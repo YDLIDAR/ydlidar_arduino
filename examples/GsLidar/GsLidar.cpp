@@ -47,6 +47,8 @@ bool GsLidar::start(uint32_t timeout)
   if (!isOpen())
     return false;
 
+  stop(); //先停止
+
   //重置设备地址
   if (!resetDeviceAddr())
   {
@@ -251,6 +253,10 @@ bool GsLidar::getPoints(Points& ps, uint32_t timeout)
           else //GS2，GS5
             angTrans(dist, i, &angle, &dist);
         }
+        else
+        {
+          angle = .0;
+        }
 
         //TODO: 可考虑增加去重代码
 
@@ -277,7 +283,9 @@ String GsLidar::getVersion() const
   //初版
   //V1.1
   //优化读取点云数据校验和字节失败的问题
-  return "V1.0";
+  //V1.2
+  //增加启动前先停止，防止设备软重置时初始化失败
+  return "V1.2";
 }
 
 bool GsLidar::sendCmd(
